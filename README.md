@@ -1,4 +1,4 @@
-# ESGI-NODE
+# Thibault BALSAMO
 
 Ce dépot contient un serveur web / API en Node.js.
 
