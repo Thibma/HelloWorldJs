@@ -45,8 +45,7 @@ app.post('/chat', function(req, res) {
     }
 
     else {
-        var rawData = fs.readFileSync("reponses.json")
-        var data = JSON.parse(rawData)
+        var data = readValuesFromFile()
         if (data[msg] != null) {
             res.send(msg + " :" + data[msg])
         }
