@@ -35,12 +35,8 @@ app.post('/chat', function(req, res) {
 
     else if (msg.includes("=")) {
         const [ cle, valeur ] = req.body.msg.split(' = ')
-        //const valeursExistantes = readValuesFromFile()
-        readValuesFromFile(function(err, values) {
-            if (err) {
-                res.send('error while reading reponses.json', err)
-            }
-            else {
+        readValuesFromFile()
+            .then(function(values) {
                 fs.writeFile('reponses.json', JSON.stringify({
                     ...valeursExistantes,
                     [cle]: valeur
@@ -53,8 +49,10 @@ app.post('/chat', function(req, res) {
                         res.send("Merci pour cette information !")
                     }       
                 })
-            }
-        })
+            })
+            .catch(function(err) {
+                res.send('error while reading reponses.json', err)
+            })    
     }
 
     else {
