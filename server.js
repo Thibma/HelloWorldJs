@@ -1,6 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const fs = require('fs')
+const util = require('util')
 const app = express()
 
 var port = process.env.PORT || 3000;
@@ -57,19 +58,18 @@ app.post('/chat', function(req, res) {
     }
 
     else {
-        readValuesFromFile(function(err, values) {
-            if (err) {
-                res.send('error while reading reponses.json', err)
+        readValuesFromFile()
+        .then(function(values) {
+            const data = values
+            if (data[msg] != null) {
+                res.send(msg + " :" + data[msg])
             }
             else {
-                const data = values
-                if (data[msg] != null) {
-                    res.send(msg + " :" + data[msg])
-                }
-                else {
-                    res.send("Je ne connais pas " + msg + "...")
-                }
+                res.send("Je ne connais pas " + msg + "...")
             } 
+        })
+        .catch(function(err) {
+            res.send('error while reading reponses.json', err)
         })
     }
 })
@@ -78,14 +78,17 @@ app.listen(port, function() {
     console.log("Example app listening on port 3000!")
 })
 
-function readValuesFromFile(callback) {
-    fs.readFile('reponses.json', { encoding: 'utf8' }, function(err, data) {
-        if (err) {
-            callback(err)
-        }
-        else {
-        valeursExistantes = JSON.parse(data);
-        callback (null, valeursExistantes);
-        }
-    });
+function readValuesFromFile() {
+    return new Promise (function (resolve, reject) {
+        fs.readFile('reponses.json', { encoding: 'utf8' }, function(err, data) {
+            if (err) {
+                reject(err)
+            }
+            else {
+            valeursExistantes = JSON.parse(data);
+            resolve(valeursExistantes)
+            }
+        })
+    })
+    
   }
