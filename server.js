@@ -24,7 +24,6 @@ app.get('/hello', function(req, res) {
 
 app.post('/chat', function(req, res) {
     var msg = req.body.msg
-    console.log(msg)
     if (msg == "ville") {
         res.send("Nous sommes à Paris.")
     }
@@ -35,23 +34,43 @@ app.post('/chat', function(req, res) {
 
     else if (msg.includes("=")) {
         const [ cle, valeur ] = req.body.msg.split(' = ')
-        const valeursExistantes = readValuesFromFile()
-        fs.writeFileSync('reponses.json', JSON.stringify({
-            ...valeursExistantes,
-            [cle]: valeur
-        }))
-
-        res.send("Merci pour cette information !")
+        //const valeursExistantes = readValuesFromFile()
+        readValuesFromFile(function(err, values) {
+            if (err) {
+                res.send('error while reading reponses.json', err)
+            }
+            else {
+                fs.writeFile('reponses.json', JSON.stringify({
+                    ...valeursExistantes,
+                    [cle]: valeur
+                }), function(err) {
+                    if (err) {
+                        console.error("Error while saving reponses.json", err)
+                        res.send("Il y a eu une erreur dans l\'enregistrement du fichier")
+                    }
+                    else {
+                        res.send("Merci pour cette information !")
+                    }       
+                })
+            }
+        })
     }
 
     else {
-        var data = readValuesFromFile()
-        if (data[msg] != null) {
-            res.send(msg + " :" + data[msg])
-        }
-        else {
-            res.send("Je ne connais pas " + msg + "...")
-        }
+        readValuesFromFile(function(err, values) {
+            if (err) {
+                res.send('error while reading reponses.json', err)
+            }
+            else {
+                const data = values
+                if (data[msg] != null) {
+                    res.send(msg + " :" + data[msg])
+                }
+                else {
+                    res.send("Je ne connais pas " + msg + "...")
+                }
+            } 
+        })
     }
 })
 
@@ -59,8 +78,14 @@ app.listen(port, function() {
     console.log("Example app listening on port 3000!")
 })
 
-function readValuesFromFile() {
-    const reponses = fs.readFileSync('reponses.json', { encoding: 'utf8' });
-    const valeursExistantes = JSON.parse(reponses);
-    return valeursExistantes;
+function readValuesFromFile(callback) {
+    fs.readFile('reponses.json', { encoding: 'utf8' }, function(err, data) {
+        if (err) {
+            callback(err)
+        }
+        else {
+        valeursExistantes = JSON.parse(data);
+        callback (null, valeursExistantes);
+        }
+    });
   }
