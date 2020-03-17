@@ -34,18 +34,12 @@ app.post('/chat', function(req, res) {
     }
 
     else if (msg.includes("=")) {
-        var split = msg.split('=')
-        var key = split[0]
-        key = key.split(" ").join("")
-        var value = split[1]
-        value = value.split(" ").join("")
-
-        var obj = {}
-        obj[key] = value
-
-        var json = JSON.stringify(obj)
-
-        fs.writeFileSync("reponses.json", json, 'utf8')
+        const [ cle, valeur ] = req.body.msg.split(' = ')
+        const valeursExistantes = readValuesFromFile()
+        fs.writeFileSync('reponses.json', JSON.stringify({
+            ...valeursExistantes,
+            [cle]: valeur
+        }))
 
         res.send("Merci pour cette information !")
     }
@@ -65,3 +59,9 @@ app.post('/chat', function(req, res) {
 app.listen(port, function() {
     console.log("Example app listening on port 3000!")
 })
+
+function readValuesFromFile() {
+    const reponses = fs.readFileSync('reponses.json', { encoding: 'utf8' });
+    const valeursExistantes = JSON.parse(reponses);
+    return valeursExistantes;
+  }
