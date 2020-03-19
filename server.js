@@ -41,7 +41,7 @@ app.get('/hello', function(req, res) {
     }
 })
 
-app.get('/messages/all', async function(req, res) {
+app.get('   ', async function(req, res) {
     const db = client.db(dbName)
 
     const collection = db.collection('messages')
@@ -109,10 +109,10 @@ app.delete('/messages/last', async function(req, res) {
             var del = collection.deleteOne(message)
             var ok = ok && del.deleteCount == 1
         })
-        res.send(ok ? "Last message deleted" : "Error when delete")
+        res.send(ok ? "Derniers messages supprimés." : "Error when delete")
     }
     else {
-        res.send("No docuement to delete")
+        res.send("Aucun messages à supprimer !")
     }
 })
 
