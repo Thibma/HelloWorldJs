@@ -7,7 +7,7 @@ async function mongo() {
 
     // Nom de la base de donnée
     const dbName = 'nodejs'
-    const client = new MongoClient(url)
+    const client = new MongoClient(url, { useUnifiedTopology: true } ,{ useNewUrlParser: true })
 
     try {
         // Connexion au serveur
